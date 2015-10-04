@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 moveTitleAnimation();
             }
-        }, 2000);
+        }, 2100);
 
         animationHandler.postDelayed(new Runnable() {
             @Override
