@@ -5,7 +5,9 @@ import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.DecelerateInterpolator;
@@ -13,7 +15,6 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -26,7 +27,8 @@ public class MainActivity extends AppCompatActivity {
 
     private RelativeLayout welcome;
     private TextView welcomeTitle;
-    private LinearLayout welcomeBackground;
+    private TextView welcomeCopyright;
+    private View welcomeBackground;
 
     private Handler animationHandler;
 
@@ -62,7 +64,8 @@ public class MainActivity extends AppCompatActivity {
         });
         welcome = (RelativeLayout) findViewById(R.id.rl_welcome);
         welcomeTitle = (TextView) findViewById(R.id.tv_welcome_title);
-        welcomeBackground = (LinearLayout) findViewById(R.id.ll_welcome_background);
+        welcomeCopyright = (TextView) findViewById(R.id.tv_welcome_copyright);
+        welcomeBackground = findViewById(R.id.ll_welcome_background);
 
         // hide actionbar
         ActionBar actionBar = getSupportActionBar();
@@ -93,9 +96,16 @@ public class MainActivity extends AppCompatActivity {
         animationHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                showCopyrightAnimation();
+                moveTitleAnimation();
             }
         }, 2000);
+
+        animationHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                showCopyrightAnimation();
+            }
+        }, 2700);
     }
 
     private void showWelcomeAnimation() {
@@ -125,15 +135,19 @@ public class MainActivity extends AppCompatActivity {
 
         TranslateAnimation expandTranslate = new TranslateAnimation(
                 Animation.RELATIVE_TO_SELF, 0,
-                Animation.RELATIVE_TO_SELF, -0.48f,
                 Animation.RELATIVE_TO_SELF, 0,
-                Animation.RELATIVE_TO_SELF, -0.2f);
+                Animation.RELATIVE_TO_SELF, 0,
+                Animation.RELATIVE_TO_SELF, 0.1f);
         expandTranslate.setDuration(200);
         expandTranslate.setStartOffset(1325);
         expandTranslate.setInterpolator(new LinearInterpolator());
         animationSet.addAnimation(expandTranslate);
 
-        ScaleAnimation expandScale = new ScaleAnimation(1, 20, 1, 20);
+        ScaleAnimation expandScale = new ScaleAnimation(
+                1, 20, 1, 20,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+
         expandScale.setDuration(300);
         expandScale.setStartOffset(1325);
         expandScale.setInterpolator(new LinearInterpolator());
@@ -142,8 +156,24 @@ public class MainActivity extends AppCompatActivity {
         welcomeBackground.startAnimation(animationSet);
     }
 
-    private void showCopyrightAnimation() {
+    private void moveTitleAnimation() {
+        TranslateAnimation translateAnimation = new TranslateAnimation(
+                Animation.RELATIVE_TO_SELF, 0,
+                Animation.RELATIVE_TO_SELF, 0,
+                Animation.RELATIVE_TO_SELF, 0,
+                Animation.RELATIVE_TO_SELF, -2.5f);
+        translateAnimation.setDuration(500);
+        translateAnimation.setFillEnabled(true);
+        translateAnimation.setFillAfter(true);
+        translateAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+        welcomeTitle.startAnimation(translateAnimation);
+    }
 
+    private void showCopyrightAnimation() {
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
+        alphaAnimation.setDuration(300);
+        welcomeCopyright.setVisibility(View.VISIBLE);
+        welcomeCopyright.startAnimation(alphaAnimation);
     }
 
 }
