@@ -15,6 +15,7 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout welcome;
     private TextView welcomeTitle;
     private TextView welcomeCopyright;
+    private ImageView welcomeIcon;
     private View welcomeBackground;
 
     private Handler animationHandler;
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         welcome = (RelativeLayout) findViewById(R.id.rl_welcome);
         welcomeTitle = (TextView) findViewById(R.id.tv_welcome_title);
         welcomeCopyright = (TextView) findViewById(R.id.tv_welcome_copyright);
+        welcomeIcon = (ImageView) findViewById(R.id.iv_welcome_icon);
         welcomeBackground = findViewById(R.id.ll_welcome_background);
 
         // hide actionbar
@@ -105,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 showCopyrightAnimation();
             }
-        }, 2700);
+        }, 2800);
     }
 
     private void showWelcomeAnimation() {
@@ -161,17 +164,22 @@ public class MainActivity extends AppCompatActivity {
                 Animation.RELATIVE_TO_SELF, 0,
                 Animation.RELATIVE_TO_SELF, 0,
                 Animation.RELATIVE_TO_SELF, 0,
-                Animation.RELATIVE_TO_SELF, -2.5f);
+                Animation.RELATIVE_TO_SELF, 1f);
         translateAnimation.setDuration(500);
         translateAnimation.setFillEnabled(true);
         translateAnimation.setFillAfter(true);
         translateAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
         welcomeTitle.startAnimation(translateAnimation);
+
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
+        alphaAnimation.setDuration(500);
+        welcomeIcon.setVisibility(View.VISIBLE);
+        welcomeIcon.startAnimation(alphaAnimation);
     }
 
     private void showCopyrightAnimation() {
         AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
-        alphaAnimation.setDuration(300);
+        alphaAnimation.setDuration(200);
         welcomeCopyright.setVisibility(View.VISIBLE);
         welcomeCopyright.startAnimation(alphaAnimation);
     }

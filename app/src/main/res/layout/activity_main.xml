@@ -21,6 +21,15 @@
             android:background="@drawable/welcome_backbround"
             android:orientation="vertical"></View>
 
+        <ImageView
+            android:id="@+id/iv_welcome_icon"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            android:src="@mipmap/icon_large"
+            android:visibility="invisible" />
+
         <TextView
             android:id="@+id/tv_welcome_title"
             android:layout_width="wrap_content"
