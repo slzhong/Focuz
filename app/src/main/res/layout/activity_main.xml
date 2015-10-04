@@ -7,20 +7,40 @@
     tools:context=".MainActivity">
 
     <RelativeLayout
-        android:id="@+id/fl_scene_welcome"
+        android:id="@+id/rl_welcome"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <LinearLayout
+            android:id="@+id/ll_welcome_background"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="-55dp"
+            android:background="@drawable/welcome_backbround"
+            android:orientation="vertical"></LinearLayout>
+
         <TextView
-            android:id="@+id/tv_title"
+            android:id="@+id/tv_welcome_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="@string/app_name"
             android:textColor="@color/main_bright"
-            android:textSize="50sp"/>
+            android:textSize="40sp" />
 
-
+        <TextView
+            android:id="@+id/tv_welcome_copyright"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:text="@string/app_copyright"
+            android:textColor="@color/main_bright"
+            android:textSize="10dp"
+            android:visibility="invisible" />
 
     </RelativeLayout>
 
