@@ -1,10 +1,20 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fl_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000"
     tools:context=".MainActivity">
+
+    <View
+        android:id="@+id/ll_welcome_background_pseudo"
+        android:layout_width="500dp"
+        android:layout_height="500dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/welcome_backbround"
+        android:scaleX="2"
+        android:scaleY="2"
+        android:visibility="invisible" />
 
     <RelativeLayout
         android:id="@+id/rl_welcome"
@@ -18,8 +28,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="-55dp"
-            android:background="@drawable/welcome_backbround"
-            android:orientation="vertical"></View>
+            android:background="@drawable/welcome_backbround" />
 
         <ImageView
             android:id="@+id/iv_welcome_icon"
@@ -53,4 +62,22 @@
 
     </RelativeLayout>
 
-</FrameLayout>
+    <RelativeLayout
+        android:id="@+id/rl_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleX="0.7"
+        android:scaleY="0.7"
+        android:visibility="invisible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="MAIN"
+            android:textColor="@color/main_bright"
+            android:textSize="50sp" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

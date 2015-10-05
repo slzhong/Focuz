@@ -1,4 +1,4 @@
-package cn.slzhong.focuz;
+package cn.slzhong.focuz.Activities;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,24 +14,28 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import cn.slzhong.focuz.R;
 
 /**
  * MainActivity
  */
 public class MainActivity extends AppCompatActivity {
 
-    private FrameLayout root;
-
+    // views
+    private RelativeLayout root;
     private RelativeLayout welcome;
     private TextView welcomeTitle;
     private TextView welcomeCopyright;
     private ImageView welcomeIcon;
     private View welcomeBackground;
+    private View welcomeBackgroundPseudo;
+    private RelativeLayout main;
 
+    // data
     private Handler animationHandler;
 
     @Override
@@ -57,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initViews() {
         // init components
-        root = (FrameLayout) findViewById(R.id.fl_root);
+        root = (RelativeLayout) findViewById(R.id.fl_root);
         root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
         welcomeCopyright = (TextView) findViewById(R.id.tv_welcome_copyright);
         welcomeIcon = (ImageView) findViewById(R.id.iv_welcome_icon);
         welcomeBackground = findViewById(R.id.ll_welcome_background);
+        welcomeBackgroundPseudo = findViewById(R.id.ll_welcome_background_pseudo);
+
+        main = (RelativeLayout) findViewById(R.id.rl_main);
 
         // hide actionbar
         ActionBar actionBar = getSupportActionBar();
@@ -93,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 
+    /**
+     * functions of animations
+     */
     private void showAnimations() {
         showWelcomeAnimation();
 
@@ -102,13 +112,24 @@ public class MainActivity extends AppCompatActivity {
                 moveTitleAnimation();
             }
         }, 2100);
-
         animationHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 showCopyrightAnimation();
             }
         }, 2800);
+        animationHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                hideWelcomeAnimation();
+            }
+        }, 5200);
+        animationHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                showMain();
+            }
+        }, 5300);
     }
 
     private void showWelcomeAnimation() {
@@ -182,6 +203,47 @@ public class MainActivity extends AppCompatActivity {
         alphaAnimation.setDuration(200);
         welcomeCopyright.setVisibility(View.VISIBLE);
         welcomeCopyright.startAnimation(alphaAnimation);
+    }
+
+    private void hideWelcomeAnimation() {
+        welcomeBackground.setVisibility(View.INVISIBLE);
+        welcomeBackgroundPseudo.setVisibility(View.VISIBLE);
+
+        ScaleAnimation scaleContent = new ScaleAnimation(
+                1, 0, 1, 0,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        scaleContent.setDuration(300);
+        scaleContent.setFillAfter(true);
+        welcome.startAnimation(scaleContent);
+
+        ScaleAnimation scaleBackground = new ScaleAnimation(
+                2, 0, 2, 0,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        scaleBackground.setDuration(300);
+        scaleBackground.setFillAfter(true);
+        welcomeBackgroundPseudo.startAnimation(scaleBackground);
+    }
+
+    private void showMain() {
+        main.setVisibility(View.VISIBLE);
+
+        AnimationSet animationSet = new AnimationSet(true);
+        animationSet.setDuration(200);
+        animationSet.setFillEnabled(true);
+        animationSet.setFillAfter(true);
+
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
+        animationSet.addAnimation(alphaAnimation);
+
+        ScaleAnimation scaleAnimation = new ScaleAnimation(
+                0.7f, 1, 0.7f, 1,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        animationSet.addAnimation(scaleAnimation);
+
+        main.startAnimation(animationSet);
     }
 
 }
