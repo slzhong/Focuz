@@ -19,7 +19,8 @@
     <RelativeLayout
         android:id="@+id/rl_welcome"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="gone">
 
         <View
             android:id="@+id/ll_welcome_background"
@@ -63,20 +64,56 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/rl_main"
+        android:id="@+id/rl_login"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleX="0.7"
         android:scaleY="0.7"
-        android:visibility="invisible">
+        android:visibility="visible">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/iv_login_icon"
+            android:layout_width="200px"
+            android:layout_height="200px"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="50dp"
+            android:src="@mipmap/icon_large" />
+
+        <EditText
+            android:id="@+id/et_account"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="MAIN"
+            android:layout_below="@+id/iv_login_icon"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:hint="ACCOUNT"
             android:textColor="@color/main_bright"
-            android:textSize="50sp" />
+            android:textColorHint="@color/main_gray"
+            android:textSize="30sp" />
+
+        <EditText
+            android:id="@+id/et_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/iv_login_icon"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:hint="PASSWORD"
+            android:textColor="@color/main_bright"
+            android:textColorHint="@color/main_gray"
+            android:textSize="30sp" />
+
+        <EditText
+            android:id="@+id/et_confirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/iv_login_icon"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:hint="CONFIRM PASSWORD"
+            android:textColor="@color/main_bright"
+            android:textColorHint="@color/main_gray"
+            android:textSize="30sp" />
 
     </RelativeLayout>
 

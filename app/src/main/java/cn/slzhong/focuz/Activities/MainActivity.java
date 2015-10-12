@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView welcomeIcon;
     private View welcomeBackground;
     private View welcomeBackgroundPseudo;
-    private RelativeLayout main;
+    private RelativeLayout login;
 
     // data
     private Handler animationHandler;
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         initViews();
         initData();
-        showAnimations();
+//        showAnimations();
     }
 
     @Override
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         welcomeBackground = findViewById(R.id.ll_welcome_background);
         welcomeBackgroundPseudo = findViewById(R.id.ll_welcome_background_pseudo);
 
-        main = (RelativeLayout) findViewById(R.id.rl_main);
+        login = (RelativeLayout) findViewById(R.id.rl_login);
 
         // hide actionbar
         ActionBar actionBar = getSupportActionBar();
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * functions of animations
      */
-    private void showAnimations() {
+    private void showWelcome() {
         showWelcomeAnimation();
 
         animationHandler.postDelayed(new Runnable() {
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showMain() {
-        main.setVisibility(View.VISIBLE);
+        login.setVisibility(View.VISIBLE);
 
         AnimationSet animationSet = new AnimationSet(true);
         animationSet.setDuration(200);
@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
                 Animation.RELATIVE_TO_SELF, 0.5f);
         animationSet.addAnimation(scaleAnimation);
 
-        main.startAnimation(animationSet);
+        login.startAnimation(animationSet);
     }
 
 }
