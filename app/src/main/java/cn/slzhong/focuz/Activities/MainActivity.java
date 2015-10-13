@@ -1,5 +1,6 @@
 package cn.slzhong.focuz.Activities;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
@@ -14,6 +15,8 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -34,6 +37,11 @@ public class MainActivity extends AppCompatActivity {
     private View welcomeBackground;
     private View welcomeBackgroundPseudo;
     private RelativeLayout login;
+    private EditText loginAccount;
+    private EditText loginPassword;
+    private EditText loginConfirm;
+    private Button loginSignin;
+    private Button loginSignup;
 
     // data
     private Handler animationHandler;
@@ -76,6 +84,13 @@ public class MainActivity extends AppCompatActivity {
         welcomeBackgroundPseudo = findViewById(R.id.ll_welcome_background_pseudo);
 
         login = (RelativeLayout) findViewById(R.id.rl_login);
+        loginAccount = (EditText) findViewById(R.id.et_account);
+        loginPassword = (EditText) findViewById(R.id.et_password);
+        loginConfirm = (EditText) findViewById(R.id.et_confirm);
+        loginSignin = (Button) findViewById(R.id.bt_signin);
+        loginSignup = (Button) findViewById(R.id.bt_signup);
+        loginSignin.setOnClickListener(new SigninListener());
+        loginSignup.setOnClickListener(new SignupListener());
 
         // hide actionbar
         ActionBar actionBar = getSupportActionBar();
@@ -244,6 +259,44 @@ public class MainActivity extends AppCompatActivity {
         animationSet.addAnimation(scaleAnimation);
 
         login.startAnimation(animationSet);
+    }
+
+    /**
+     * funcitions of notices like alert and toast
+     */
+    private void showAlert(String msg) {
+        new AlertDialog.Builder(this)
+                .setTitle("NOTICE")
+                .setMessage(msg)
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
+    /**
+     * private classes
+     */
+    private class SigninListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            if (loginAccount.getText().length() * loginPassword.getText().length() == 0) {
+                showAlert("PLEASE ENTER ACCOUNT AND PASSWORD");
+            } else {
+
+            }
+        }
+    }
+
+    private class SignupListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            if (loginConfirm.getVisibility() == View.GONE) {
+                loginConfirm.setVisibility(View.VISIBLE);
+            } else if (!loginPassword.getText().equals(loginConfirm.getText())) {
+                showAlert("PASSWORDS DO NOT MATCH");
+            } else {
+
+            }
+        }
     }
 
 }

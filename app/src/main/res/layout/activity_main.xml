@@ -76,7 +76,7 @@
             android:layout_width="200px"
             android:layout_height="200px"
             android:layout_centerHorizontal="true"
-            android:layout_margin="50dp"
+            android:layout_margin="20dp"
             android:src="@mipmap/icon_large" />
 
         <EditText
@@ -86,34 +86,69 @@
             android:layout_below="@+id/iv_login_icon"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/input_background"
             android:hint="ACCOUNT"
-            android:textColor="@color/main_bright"
+            android:textColor="@color/main_dark"
             android:textColorHint="@color/main_gray"
-            android:textSize="30sp" />
+            android:textSize="25sp" />
 
         <EditText
             android:id="@+id/et_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/iv_login_icon"
+            android:layout_below="@+id/et_account"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/input_background"
             android:hint="PASSWORD"
-            android:textColor="@color/main_bright"
+            android:password="true"
+            android:textColor="@color/main_dark"
             android:textColorHint="@color/main_gray"
-            android:textSize="30sp" />
+            android:textSize="25sp" />
 
         <EditText
             android:id="@+id/et_confirm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/iv_login_icon"
+            android:layout_below="@+id/et_password"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/input_background"
             android:hint="CONFIRM PASSWORD"
-            android:textColor="@color/main_bright"
+            android:password="true"
+            android:textColor="@color/main_dark"
             android:textColorHint="@color/main_gray"
-            android:textSize="30sp" />
+            android:textSize="25sp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/bt_signin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_confirm"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/button_background"
+            android:text="SIGN IN"
+            android:textColor="@color/main_bright"
+            android:textSize="25sp" />
+
+        <Button
+            android:id="@+id/bt_signup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bt_signin"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/button_background"
+            android:text="SIGN Up"
+            android:textColor="@color/main_bright"
+            android:textSize="25sp" />
 
     </RelativeLayout>
 

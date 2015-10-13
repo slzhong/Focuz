@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="theme">#33b5e5</color>
+    <color name="theme_dark">#209ac7</color>
+    <color name="theme_bright">#5cccf5</color>
+
     <color name="main_bright">#fff</color>
     <color name="main_gray">#aaa</color>
     <color name="main_dark">#000</color>
-    <color name="main_theme">#33b5e5</color>
+
 </resources>
