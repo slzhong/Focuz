@@ -3,6 +3,7 @@ package cn.slzhong.focuz.Activities;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -21,6 +22,10 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
+import cn.slzhong.focuz.Constants.URLS;
+import cn.slzhong.focuz.Models.User;
 import cn.slzhong.focuz.R;
 
 /**
@@ -45,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     // data
     private Handler animationHandler;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {
         animationHandler = new Handler();
+        user = User.getInstance();
     }
 
     private void enterFullscreen() {
@@ -265,11 +272,17 @@ public class MainActivity extends AppCompatActivity {
      * funcitions of notices like alert and toast
      */
     private void showAlert(String msg) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            Looper.prepare();
+        }
         new AlertDialog.Builder(this)
                 .setTitle("NOTICE")
                 .setMessage(msg)
                 .setPositiveButton("OK", null)
                 .show();
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            Looper.loop();
+        }
     }
 
     /**
@@ -281,7 +294,24 @@ public class MainActivity extends AppCompatActivity {
             if (loginAccount.getText().length() * loginPassword.getText().length() == 0) {
                 showAlert("PLEASE ENTER ACCOUNT AND PASSWORD");
             } else {
-
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            JSONObject result = user.signInAndOut(loginAccount.getText().toString(), loginPassword.getText().toString(), URLS.SIGNIN);
+                            if (result == null) {
+                                showAlert("UNKNOWN ERROR");
+                            } else if (result.getInt("code") == 500) {
+                                showAlert(result.getString("msg"));
+                            } else {
+                                showAlert("SUCCESS");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            showAlert("UNKNOWN ERROR");
+                        }
+                    }
+                }).start();
             }
         }
     }
@@ -291,10 +321,27 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             if (loginConfirm.getVisibility() == View.GONE) {
                 loginConfirm.setVisibility(View.VISIBLE);
-            } else if (!loginPassword.getText().equals(loginConfirm.getText())) {
+            } else if (!loginPassword.getText().toString().equals(loginConfirm.getText().toString())) {
                 showAlert("PASSWORDS DO NOT MATCH");
             } else {
-
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            JSONObject result = user.signInAndOut(loginAccount.getText().toString(), loginPassword.getText().toString(), URLS.SIGNUP);
+                            if (result == null) {
+                                showAlert("UNKNOWN ERROR");
+                            } else if (result.getInt("code") == 500) {
+                                showAlert(result.getString("msg"));
+                            } else {
+                                showAlert("SUCCESS");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            showAlert("UNKNOWN ERROR");
+                        }
+                    }
+                }).start();
             }
         }
     }
