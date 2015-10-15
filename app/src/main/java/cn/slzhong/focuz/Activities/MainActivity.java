@@ -1,9 +1,11 @@
 package cn.slzhong.focuz.Activities;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -16,6 +18,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -24,6 +27,7 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
+import cn.slzhong.focuz.Constants.CODES;
 import cn.slzhong.focuz.Constants.URLS;
 import cn.slzhong.focuz.Models.User;
 import cn.slzhong.focuz.R;
@@ -47,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText loginConfirm;
     private Button loginSignin;
     private Button loginSignup;
+    private RelativeLayout main;
 
     // data
     private Handler animationHandler;
@@ -59,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
         initViews();
         initData();
-//        showAnimations();
+        showWelcome();
     }
 
     @Override
@@ -98,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
         loginSignin.setOnClickListener(new SigninListener());
         loginSignup.setOnClickListener(new SignupListener());
 
+        main = (RelativeLayout) findViewById(R.id.rl_main);
+
         // hide actionbar
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -109,8 +116,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        animationHandler = new Handler();
-        user = User.getInstance();
+        user = User.getInstance(this);
+        animationHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                if (msg.what == CODES.SIGN_SUCCESS) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(root.getWindowToken(), 0);
+                    hideScene(login);
+                    showScene(main);
+                }
+            }
+        };
     }
 
     private void enterFullscreen() {
@@ -149,7 +167,11 @@ public class MainActivity extends AppCompatActivity {
         animationHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                showMain();
+                if (user.hasSignedIn) {
+                    showScene(main);
+                } else {
+                    showScene(login);
+                }
             }
         }, 5300);
     }
@@ -248,11 +270,11 @@ public class MainActivity extends AppCompatActivity {
         welcomeBackgroundPseudo.startAnimation(scaleBackground);
     }
 
-    private void showMain() {
-        login.setVisibility(View.VISIBLE);
+    private void showScene(RelativeLayout scene) {
+        scene.setVisibility(View.VISIBLE);
 
         AnimationSet animationSet = new AnimationSet(true);
-        animationSet.setDuration(200);
+        animationSet.setDuration(300);
         animationSet.setFillEnabled(true);
         animationSet.setFillAfter(true);
 
@@ -265,7 +287,21 @@ public class MainActivity extends AppCompatActivity {
                 Animation.RELATIVE_TO_SELF, 0.5f);
         animationSet.addAnimation(scaleAnimation);
 
-        login.startAnimation(animationSet);
+        scene.startAnimation(animationSet);
+    }
+
+    private void hideScene(final RelativeLayout scene) {
+        AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
+        alphaAnimation.setDuration(300);
+        alphaAnimation.setFillEnabled(true);
+        alphaAnimation.setFillAfter(true);
+        scene.startAnimation(alphaAnimation);
+        animationHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                scene.setVisibility(View.GONE);
+            }
+        }, 310);
     }
 
     /**
@@ -298,13 +334,16 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         try {
-                            JSONObject result = user.signInAndOut(loginAccount.getText().toString(), loginPassword.getText().toString(), URLS.SIGNIN);
+                            JSONObject result = user.signInAndUp(loginAccount.getText().toString(), loginPassword.getText().toString(), URLS.SIGNIN);
                             if (result == null) {
                                 showAlert("UNKNOWN ERROR");
                             } else if (result.getInt("code") == 500) {
                                 showAlert(result.getString("msg"));
                             } else {
-                                showAlert("SUCCESS");
+//                                showAlert("SUCCESS");
+                                Message message = new Message();
+                                message.what = CODES.SIGN_SUCCESS;
+                                animationHandler.sendMessage(message);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -328,13 +367,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         try {
-                            JSONObject result = user.signInAndOut(loginAccount.getText().toString(), loginPassword.getText().toString(), URLS.SIGNUP);
+                            JSONObject result = user.signInAndUp(loginAccount.getText().toString(), loginPassword.getText().toString(), URLS.SIGNUP);
                             if (result == null) {
                                 showAlert("UNKNOWN ERROR");
                             } else if (result.getInt("code") == 500) {
                                 showAlert(result.getString("msg"));
                             } else {
-                                showAlert("SUCCESS");
+                                Message message = new Message();
+                                message.what = CODES.SIGN_SUCCESS;
+                                animationHandler.sendMessage(message);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();

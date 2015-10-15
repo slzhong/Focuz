@@ -20,7 +20,7 @@
         android:id="@+id/rl_welcome"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <View
             android:id="@+id/ll_welcome_background"
@@ -69,12 +69,12 @@
         android:layout_height="match_parent"
         android:scaleX="0.7"
         android:scaleY="0.7"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/iv_login_icon"
-            android:layout_width="200px"
-            android:layout_height="200px"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:layout_centerHorizontal="true"
             android:layout_margin="20dp"
             android:src="@mipmap/icon_large" />
@@ -149,6 +149,24 @@
             android:text="SIGN Up"
             android:textColor="@color/main_bright"
             android:textSize="25sp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleX="0.7"
+        android:scaleY="0.7"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="MAIN"
+            android:textColor="@color/main_bright"
+            android:textSize="50sp" />
 
     </RelativeLayout>
 
