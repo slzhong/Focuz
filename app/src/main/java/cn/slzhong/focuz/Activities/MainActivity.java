@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hideWelcomeAnimation() {
-        welcomeBackground.setVisibility(View.INVISIBLE);
+        welcomeBackground.setVisibility(View.GONE);
         welcomeBackgroundPseudo.setVisibility(View.VISIBLE);
 
         ScaleAnimation scaleContent = new ScaleAnimation(

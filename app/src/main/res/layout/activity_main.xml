@@ -14,7 +14,7 @@
         android:background="@drawable/welcome_backbround"
         android:scaleX="2"
         android:scaleY="2"
-        android:visibility="invisible" />
+        android:visibility="gone" />
 
     <RelativeLayout
         android:id="@+id/rl_welcome"
@@ -38,7 +38,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="100dp"
             android:src="@mipmap/icon_large"
-            android:visibility="invisible" />
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tv_welcome_title"
@@ -67,8 +67,6 @@
         android:id="@+id/rl_login"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleX="0.7"
-        android:scaleY="0.7"
         android:visibility="gone">
 
         <ImageView
@@ -156,17 +154,45 @@
         android:id="@+id/rl_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleX="0.7"
-        android:scaleY="0.7"
         android:visibility="gone">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/bt_timer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/bt_stopwatch"
+            android:layout_marginBottom="30dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/button_background"
+            android:text="TIMER TASK"
+            android:textColor="@color/main_bright"
+            android:textSize="25sp" />
+
+        <Button
+            android:id="@+id/bt_stopwatch"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="MAIN"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/button_background"
+            android:text="STOPWATCH TASK"
             android:textColor="@color/main_bright"
-            android:textSize="50sp" />
+            android:textSize="25sp" />
+
+        <Button
+            android:id="@+id/bt_history"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/bt_stopwatch"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/button_background"
+            android:text="HISTORY"
+            android:textColor="@color/main_bright"
+            android:textSize="25sp" />
 
     </RelativeLayout>
 
