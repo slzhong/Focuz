@@ -570,7 +570,6 @@ public class MainActivity extends AppCompatActivity {
                             } else if (result.getInt("code") == 500) {
                                 showAlert(result.getString("msg"));
                             } else {
-//                                showAlert("SUCCESS");
                                 Message message = new Message();
                                 message.what = CODES.SIGN_SUCCESS;
                                 animationHandler.sendMessage(message);
