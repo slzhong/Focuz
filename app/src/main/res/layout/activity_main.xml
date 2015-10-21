@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000"
+    android:keepScreenOn="true"
     tools:context=".MainActivity">
 
     <View
@@ -156,6 +157,16 @@
         android:layout_height="match_parent"
         android:visibility="gone">
 
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="30dp"
+            android:gravity="center"
+            android:textColor="@color/main_bright"
+            android:textSize="20sp" />
+
         <Button
             android:id="@+id/bt_timer"
             android:layout_width="match_parent"
@@ -193,6 +204,27 @@
             android:text="HISTORY"
             android:textColor="@color/main_bright"
             android:textSize="25sp" />
+
+        <Button
+            android:id="@+id/bt_stop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/button_background"
+            android:text="STOP TASK"
+            android:textColor="@color/main_bright"
+            android:textSize="25sp"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_rate"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
 
     </RelativeLayout>
 

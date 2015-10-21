@@ -1,6 +1,7 @@
 package cn.slzhong.focuz.Activities;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,10 +26,13 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.neurosky.thinkgear.TGDevice;
+
 import org.json.JSONObject;
 
 import cn.slzhong.focuz.Constants.CODES;
 import cn.slzhong.focuz.Constants.URLS;
+import cn.slzhong.focuz.Models.Recorder;
 import cn.slzhong.focuz.Models.User;
 import cn.slzhong.focuz.R;
 
@@ -52,10 +56,28 @@ public class MainActivity extends AppCompatActivity {
     private Button loginSignin;
     private Button loginSignup;
     private RelativeLayout main;
+    private Button mainTimer;
+    private Button mainStopwatch;
+    private Button mainHistory;
+    private Button mainStop;
+    private TextView mainStatus;
+    private RelativeLayout rate;
 
     // data
     private Handler animationHandler;
+    private Handler tgHandler;
+    private BluetoothAdapter bluetoothAdapter;
+    private TGDevice tgDevice;
+    private Recorder tgRecorder;
+    private Runnable tgRunnable;
     private User user;
+
+    // flags and temps
+    private boolean tgConnected = false;
+    private int tgAttention = 0;
+    private int tgMeditation = 0;
+    private int tgTime = -1;
+    private int tgCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +126,16 @@ public class MainActivity extends AppCompatActivity {
         loginSignup.setOnClickListener(new SignupListener());
 
         main = (RelativeLayout) findViewById(R.id.rl_main);
+        mainTimer = (Button) findViewById(R.id.bt_timer);
+        mainStopwatch = (Button) findViewById(R.id.bt_stopwatch);
+        mainHistory = (Button) findViewById(R.id.bt_history);
+        mainStop = (Button) findViewById(R.id.bt_stop);
+        mainStatus = (TextView) findViewById(R.id.tv_status);
+        mainTimer.setOnClickListener(new TimerListener());
+        mainStopwatch.setOnClickListener(new StopwatchListener());
+        mainStop.setOnClickListener(new StopListener());
+
+        rate = (RelativeLayout) findViewById(R.id.rl_rate);
 
         // hide actionbar
         ActionBar actionBar = getSupportActionBar();
@@ -117,6 +149,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {
         user = User.getInstance(this);
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
         animationHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -126,6 +160,49 @@ public class MainActivity extends AppCompatActivity {
                     imm.hideSoftInputFromWindow(root.getWindowToken(), 0);
                     hideScene(login);
                     showScene(main);
+                    connectTG();
+                }
+            }
+        };
+
+        tgHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case TGDevice.MSG_STATE_CHANGE:
+                        switch (msg.arg1) {
+                            case TGDevice.STATE_IDLE:
+                                break;
+                            case TGDevice.STATE_CONNECTING:
+                                break;
+                            case TGDevice.STATE_CONNECTED:
+                                tgDevice.start();
+                                tgConnected = true;
+                                mainStatus.setText("");
+                                break;
+                            case TGDevice.STATE_DISCONNECTED:
+                                mainStatus.setText("THINK GEAR DEVICE NOT DISCONNECTED");
+                                break;
+                            case TGDevice.STATE_NOT_FOUND:
+                            case TGDevice.STATE_NOT_PAIRED:
+                                mainStatus.setText("THINK GEAR DEVICE NOT FOUND");
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case TGDevice.MSG_MEDITATION:
+                        System.out.println("***** m" + msg.arg1);
+                        tgMeditation = msg.arg1;
+                        break;
+                    case TGDevice.MSG_ATTENTION:
+                        System.out.println("***** a" + msg.arg1);
+                        tgAttention = msg.arg1;
+                        break;
+                    case TGDevice.MSG_RAW_DATA:
+                        break;
+                    default:
+                        break;
                 }
             }
         };
@@ -169,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 if (user.hasSignedIn) {
                     showScene(main);
+                    connectTG();
                 } else {
                     showScene(login);
                 }
@@ -322,6 +400,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * functions of recording data
+     */
+    private void connectTG() {
+        if (bluetoothAdapter != null) {
+            if (tgDevice != null) {
+                tgDevice.close();
+                tgDevice = null;
+            }
+            tgDevice = new TGDevice(bluetoothAdapter, tgHandler);
+            tgDevice.connect(true);
+            mainStatus.setText("CONNECTING TO THINK GEAR DEVICE...");
+        }
+    }
+
+    private void startLoop() {
+        if (tgRecorder != null) {
+            tgRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    tgCount++;
+                    System.out.println("***** count:" + tgCount);
+                    tgRecorder.pushAttention(tgAttention);
+                    tgRecorder.pushMeditation(tgMeditation);
+                    tgHandler.postDelayed(this, 15000);
+                }
+            };
+            tgHandler.postDelayed(tgRunnable, 0);
+        }
+    }
+
+    /**
      * private classes
      */
     private class SigninListener implements View.OnClickListener {
@@ -384,6 +493,43 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).start();
             }
+        }
+    }
+
+    private class TimerListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            if (tgConnected) {
+                tgRecorder = new Recorder();
+                mainTimer.setVisibility(View.GONE);
+                mainStopwatch.setVisibility(View.GONE);
+                mainHistory.setVisibility(View.GONE);
+                mainStop.setVisibility(View.VISIBLE);
+                startLoop();
+            } else {
+                showAlert("CONNECT TO A THINK GEAR DEVICE BEFORE STARTING A TASK");
+            }
+        }
+    }
+
+    private class StopwatchListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            if (tgConnected) {
+
+            } else {
+                showAlert("CONNECT TO A THINK GEAR DEVICE BEFORE STARTING A TASK");
+            }
+        }
+    }
+
+    private class StopListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            tgRecorder.stop();
+            tgRecorder.save();
+            tgCount = 0;
+            tgHandler.removeCallbacks(tgRunnable);
         }
     }
 
