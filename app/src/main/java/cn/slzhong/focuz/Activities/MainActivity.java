@@ -10,6 +10,7 @@ import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -25,12 +26,15 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.neurosky.thinkgear.TGDevice;
 
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -39,6 +43,7 @@ import cn.slzhong.focuz.Constants.URLS;
 import cn.slzhong.focuz.Models.Recorder;
 import cn.slzhong.focuz.Models.User;
 import cn.slzhong.focuz.R;
+import cn.slzhong.focuz.Utils.StorageUtil;
 
 /**
  * MainActivity
@@ -80,6 +85,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView resultMeditation;
     private TextView resultRate;
     private Button resultBack;
+    private ScrollView resultScroll;
+    private LinearLayout history;
+    private LinearLayout historyList;
+    private Button historyBack;
+    private ScrollView historyScroll;
 
     // data
     private Handler animationHandler;
@@ -96,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
     private int tgMeditation = 0;
     private int tgTime = -1;
     private int tgCount = 0;
+    private boolean isHistory = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
         mainTimer.setOnClickListener(new TimerListener());
         mainStopwatch.setOnClickListener(new StopwatchListener());
         mainStop.setOnClickListener(new StopListener());
+        mainHistory.setOnClickListener(new HistoryListener());
 
         rate = (RelativeLayout) findViewById(R.id.rl_rate);
         rate1 = (Button) findViewById(R.id.bt_rate_1);
@@ -175,7 +187,15 @@ public class MainActivity extends AppCompatActivity {
         resultMeditation = (TextView) findViewById(R.id.tv_meditation);
         resultRate = (TextView) findViewById(R.id.tv_rate);
         resultBack = (Button) findViewById(R.id.bt_back);
+        resultScroll = (ScrollView) findViewById(R.id.sv_result);
         resultBack.setOnClickListener(new BackListener());
+
+        history = (LinearLayout) findViewById(R.id.ll_history);
+        historyList = (LinearLayout) findViewById(R.id.ll_list);
+        historyBack = (Button) findViewById(R.id.bt_main);
+        historyScroll = (ScrollView) findViewById(R.id.sv_history);
+        historyBack.setOnClickListener(new BackListener());
+        loadHistoryList();
 
         // hide actionbar
         ActionBar actionBar = getSupportActionBar();
@@ -255,6 +275,39 @@ public class MainActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    }
+
+    private void loadHistoryList() {
+        historyList.removeAllViews();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        File[] files = StorageUtil.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            final File file = files[i];
+            TextView textView = new TextView(this);
+            textView.setText(sdf.format(new Date(Long.parseLong(file.getName()))));
+            textView.setTextColor(getResources().getColor(R.color.main_bright));
+            textView.setTextSize(20);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(0, 40, 0, 40);
+            textView.setLayoutParams(layoutParams);
+            historyList.addView(textView);
+            textView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    isHistory = true;
+                    String data = StorageUtil.readStringFromFile(file.toString());
+                    try {
+                        JSONTokener jsonTokener = new JSONTokener(data);
+                        JSONObject jsonObject = (JSONObject) jsonTokener.nextValue();
+                        showResult(new Recorder(jsonObject));
+                        hideScene(history);
+                        showScene(result);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -389,6 +442,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showScene(View scene) {
+        if (scene.getId() == R.id.ll_history) {
+            historyScroll.setVisibility(View.VISIBLE);
+        } else if (scene.getId() == R.id.ll_result) {
+            resultScroll.setVisibility(View.VISIBLE);
+        }
+
         scene.setVisibility(View.VISIBLE);
 
         AnimationSet animationSet = new AnimationSet(true);
@@ -418,6 +477,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 scene.setVisibility(View.GONE);
+                if (scene.getId() == R.id.ll_history) {
+                    historyScroll.setVisibility(View.GONE);
+                } else if (scene.getId() == R.id.ll_result) {
+                    resultScroll.setVisibility(View.GONE);
+                }
             }
         }, 310);
     }
@@ -460,7 +524,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     tgCount++;
-                    System.out.println("***** count:" + tgCount);
                     tgRecorder.pushAttention(tgAttention);
                     tgRecorder.pushMeditation(tgMeditation);
                     tgHandler.postDelayed(this, 15000);
@@ -581,6 +644,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private class HistoryListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            hideScene(main);
+            showScene(history);
+        }
+    }
+
     private class StopListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -648,6 +719,7 @@ public class MainActivity extends AppCompatActivity {
                 showResult(tgRecorder);
                 hideScene(rate);
                 showScene(result);
+                loadHistoryList();
             }
         }
     }
@@ -655,8 +727,18 @@ public class MainActivity extends AppCompatActivity {
     private class BackListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            hideScene(result);
-            showScene(main);
+            if (v.getId() == R.id.bt_back) {
+                hideScene(result);
+                if (isHistory) {
+                    showScene(history);
+                } else {
+                    showScene(main);
+                }
+            } else if (v.getId() == R.id.bt_main) {
+                hideScene(history);
+                showScene(main);
+            }
+            isHistory = false;
         }
     }
 

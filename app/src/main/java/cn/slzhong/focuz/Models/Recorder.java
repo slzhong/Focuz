@@ -1,8 +1,13 @@
 package cn.slzhong.focuz.Models;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import cn.slzhong.focuz.Utils.StorageUtil;
 
 /**
  * Created by SherlockZhong on 10/21/15.
@@ -23,6 +28,30 @@ public class Recorder {
         attentions = new ArrayList<>();
         meditations = new ArrayList<>();
         startAt = new Date().getTime();
+    }
+
+    public Recorder(JSONObject jsonObject) {
+        try {
+            startAt = jsonObject.getLong("startAt");
+            endAt = jsonObject.getLong("endAt");
+            rate = jsonObject.getInt("rate");
+            attention = jsonObject.getLong("attention");
+            meditation = jsonObject.getLong("meditation");
+
+            JSONArray jsonAttentions = jsonObject.getJSONArray("attentions");
+            attentions = new ArrayList<>();
+            for (int i = 0; i < jsonAttentions.length(); i++) {
+                attentions.add(jsonAttentions.getInt(i));
+            }
+
+            JSONArray jsonMeditations = jsonObject.getJSONArray("meditations");
+            meditations = new ArrayList<>();
+            for (int i = 0; i < jsonMeditations.length(); i++) {
+                meditations.add(jsonMeditations.getInt(i));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void pushAttention(int num) {
@@ -54,12 +83,19 @@ public class Recorder {
         }
         meditation = Math.round(1.0 * sumMeditation / meditations.size());
 
-        System.out.println("******a" + attentions);
-        System.out.println("******m" + meditations);
-        System.out.println("******t" + (endAt - startAt));
-        System.out.println("******r" + rate);
-        System.out.println("******avgA" + attention);
-        System.out.println("******avgM" + meditation);
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("startAt", startAt);
+            jsonObject.put("endAt", endAt);
+            jsonObject.put("rate", rate);
+            jsonObject.put("attention", attention);
+            jsonObject.put("meditation", meditation);
+            jsonObject.put("attentions", attentions);
+            jsonObject.put("meditations", meditations);
+            StorageUtil.saveStringAsFile(jsonObject.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
