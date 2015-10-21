@@ -197,12 +197,6 @@ public class MainActivity extends AppCompatActivity {
         historyBack.setOnClickListener(new BackListener());
         loadHistoryList();
 
-        // hide actionbar
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
-
         // hide status bar
         enterFullscreen();
     }
@@ -269,6 +263,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void enterFullscreen() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
+
         root.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
