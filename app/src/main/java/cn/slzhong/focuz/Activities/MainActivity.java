@@ -23,12 +23,16 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.neurosky.thinkgear.TGDevice;
 
 import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import cn.slzhong.focuz.Constants.CODES;
 import cn.slzhong.focuz.Constants.URLS;
@@ -62,6 +66,20 @@ public class MainActivity extends AppCompatActivity {
     private Button mainStop;
     private TextView mainStatus;
     private RelativeLayout rate;
+    private Button rate1;
+    private Button rate2;
+    private Button rate3;
+    private Button rate4;
+    private Button rate5;
+    private Button rateSave;
+    private LinearLayout result;
+    private TextView resultStart;
+    private TextView resultEnd;
+    private TextView resultTime;
+    private TextView resultAttention;
+    private TextView resultMeditation;
+    private TextView resultRate;
+    private Button resultBack;
 
     // data
     private Handler animationHandler;
@@ -136,6 +154,28 @@ public class MainActivity extends AppCompatActivity {
         mainStop.setOnClickListener(new StopListener());
 
         rate = (RelativeLayout) findViewById(R.id.rl_rate);
+        rate1 = (Button) findViewById(R.id.bt_rate_1);
+        rate2 = (Button) findViewById(R.id.bt_rate_2);
+        rate3 = (Button) findViewById(R.id.bt_rate_3);
+        rate4 = (Button) findViewById(R.id.bt_rate_4);
+        rate5 = (Button) findViewById(R.id.bt_rate_5);
+        rateSave = (Button) findViewById(R.id.bt_save);
+        rate1.setOnClickListener(new RateListener());
+        rate2.setOnClickListener(new RateListener());
+        rate3.setOnClickListener(new RateListener());
+        rate4.setOnClickListener(new RateListener());
+        rate5.setOnClickListener(new RateListener());
+        rateSave.setOnClickListener(new SaveListener());
+
+        result = (LinearLayout) findViewById(R.id.ll_result);
+        resultStart = (TextView) findViewById(R.id.tv_start);
+        resultEnd = (TextView) findViewById(R.id.tv_end);
+        resultTime = (TextView) findViewById(R.id.tv_time);
+        resultAttention = (TextView) findViewById(R.id.tv_attention);
+        resultMeditation = (TextView) findViewById(R.id.tv_meditation);
+        resultRate = (TextView) findViewById(R.id.tv_rate);
+        resultBack = (Button) findViewById(R.id.bt_back);
+        resultBack.setOnClickListener(new BackListener());
 
         // hide actionbar
         ActionBar actionBar = getSupportActionBar();
@@ -348,7 +388,7 @@ public class MainActivity extends AppCompatActivity {
         welcomeBackgroundPseudo.startAnimation(scaleBackground);
     }
 
-    private void showScene(RelativeLayout scene) {
+    private void showScene(View scene) {
         scene.setVisibility(View.VISIBLE);
 
         AnimationSet animationSet = new AnimationSet(true);
@@ -368,7 +408,7 @@ public class MainActivity extends AppCompatActivity {
         scene.startAnimation(animationSet);
     }
 
-    private void hideScene(final RelativeLayout scene) {
+    private void hideScene(final View scene) {
         AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
         alphaAnimation.setDuration(300);
         alphaAnimation.setFillEnabled(true);
@@ -428,6 +468,24 @@ public class MainActivity extends AppCompatActivity {
             };
             tgHandler.postDelayed(tgRunnable, 0);
         }
+    }
+
+    private void showResult(Recorder recorder) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        resultStart.setText("" + sdf.format(new Date(recorder.startAt)));
+        resultEnd.setText("" + sdf.format(new Date(recorder.endAt)));
+
+        long span = Math.round((recorder.endAt - recorder.startAt) / 1000.0);
+        String spanString = (span % 60) + "S";
+        span = span / 60;
+        spanString = span > 0 ? (span % 60) + "M " + spanString : spanString;
+        span = span / 60;
+        spanString = span > 0 ? (span % 60) + "H " + spanString : spanString;
+        resultTime.setText(spanString);
+
+        resultAttention.setText("" + recorder.attention);
+        resultMeditation.setText("" + recorder.meditation);
+        resultRate.setText("" + recorder.rate);
     }
 
     /**
@@ -527,9 +585,78 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             tgRecorder.stop();
-            tgRecorder.save();
             tgCount = 0;
             tgHandler.removeCallbacks(tgRunnable);
+            mainTimer.setVisibility(View.VISIBLE);
+            mainStopwatch.setVisibility(View.VISIBLE);
+            mainHistory.setVisibility(View.VISIBLE);
+            mainStop.setVisibility(View.GONE);
+            hideScene(main);
+            showScene(rate);
+        }
+    }
+
+    private class RateListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            if (tgRecorder != null) {
+                if (v.getId() == R.id.bt_rate_1) {
+                    tgRecorder.setRate(1);
+                    rate1.setBackgroundResource(R.drawable.rate_selected);
+                    rate2.setBackgroundResource(R.drawable.rate_normal);
+                    rate3.setBackgroundResource(R.drawable.rate_normal);
+                    rate4.setBackgroundResource(R.drawable.rate_normal);
+                    rate5.setBackgroundResource(R.drawable.rate_normal);
+                } else if (v.getId() == R.id.bt_rate_2) {
+                    tgRecorder.setRate(2);
+                    rate1.setBackgroundResource(R.drawable.rate_selected);
+                    rate2.setBackgroundResource(R.drawable.rate_selected);
+                    rate3.setBackgroundResource(R.drawable.rate_normal);
+                    rate4.setBackgroundResource(R.drawable.rate_normal);
+                    rate5.setBackgroundResource(R.drawable.rate_normal);
+                } else if (v.getId() == R.id.bt_rate_3) {
+                    tgRecorder.setRate(3);
+                    rate1.setBackgroundResource(R.drawable.rate_selected);
+                    rate2.setBackgroundResource(R.drawable.rate_selected);
+                    rate3.setBackgroundResource(R.drawable.rate_selected);
+                    rate4.setBackgroundResource(R.drawable.rate_normal);
+                    rate5.setBackgroundResource(R.drawable.rate_normal);
+                } else if (v.getId() == R.id.bt_rate_4) {
+                    tgRecorder.setRate(4);
+                    rate1.setBackgroundResource(R.drawable.rate_selected);
+                    rate2.setBackgroundResource(R.drawable.rate_selected);
+                    rate3.setBackgroundResource(R.drawable.rate_selected);
+                    rate4.setBackgroundResource(R.drawable.rate_selected);
+                    rate5.setBackgroundResource(R.drawable.rate_normal);
+                } else if (v.getId() == R.id.bt_rate_5) {
+                    tgRecorder.setRate(5);
+                    rate1.setBackgroundResource(R.drawable.rate_selected);
+                    rate2.setBackgroundResource(R.drawable.rate_selected);
+                    rate3.setBackgroundResource(R.drawable.rate_selected);
+                    rate4.setBackgroundResource(R.drawable.rate_selected);
+                    rate5.setBackgroundResource(R.drawable.rate_selected);
+                }
+            }
+        }
+    }
+
+    private class SaveListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            if (tgRecorder != null) {
+                tgRecorder.save();
+                showResult(tgRecorder);
+                hideScene(rate);
+                showScene(result);
+            }
+        }
+    }
+
+    private class BackListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            hideScene(result);
+            showScene(main);
         }
     }
 

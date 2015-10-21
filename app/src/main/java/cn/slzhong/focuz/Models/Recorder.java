@@ -9,11 +9,15 @@ import java.util.List;
  */
 public class Recorder {
 
-    private List<Integer> attentions;
-    private List<Integer> meditations;
+    public long startAt;
+    public long endAt;
 
-    private long startAt;
-    private long endAt;
+    public List<Integer> attentions;
+    public List<Integer> meditations;
+
+    public long attention;
+    public long meditation;
+    public int rate;
 
     public Recorder() {
         attentions = new ArrayList<>();
@@ -29,14 +33,33 @@ public class Recorder {
         meditations.add(num);
     }
 
+    public void setRate(int num) {
+        rate = num;
+    }
+
     public void stop() {
         endAt = new Date().getTime();
     }
 
     public void save() {
+        int sumAttention = 0;
+        for (int i = 0; i < attentions.size(); i++) {
+            sumAttention += attentions.get(i);
+        }
+        attention = Math.round(1.0 * sumAttention / attentions.size());
+
+        int sumMeditation = 0;
+        for (int i = 0; i < meditations.size(); i++) {
+            sumMeditation += meditations.get(i);
+        }
+        meditation = Math.round(1.0 * sumMeditation / meditations.size());
+
         System.out.println("******a" + attentions);
         System.out.println("******m" + meditations);
         System.out.println("******t" + (endAt - startAt));
+        System.out.println("******r" + rate);
+        System.out.println("******avgA" + attention);
+        System.out.println("******avgM" + meditation);
     }
 
 }
