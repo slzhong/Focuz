@@ -8,5 +8,7 @@ public class URLS {
     public static final String ROOT = "http://42.96.206.162:3210";
     public static final String SIGNIN = ROOT + "/signin";
     public static final String SIGNUP = ROOT + "/signup";
+    public static final String SAVE = ROOT + "/save";
+    public static final String LIST = ROOT + "/list/%s";
 
 }

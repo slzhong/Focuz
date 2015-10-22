@@ -1,5 +1,6 @@
 package cn.slzhong.focuz.Activities;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
     private ScrollView historyScroll;
 
     // data
+    private Activity self;
     private Handler animationHandler;
     private Handler tgHandler;
     private BluetoothAdapter bluetoothAdapter;
@@ -222,6 +224,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initData() {
+        self = this;
         user = User.getInstance(this);
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -715,7 +718,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             if (tgConnected) {
-                tgRecorder = new Recorder();
+                tgRecorder = new Recorder(user.getId());
                 mainTimer.setVisibility(View.GONE);
                 mainStopwatch.setVisibility(View.GONE);
                 mainHistory.setVisibility(View.GONE);

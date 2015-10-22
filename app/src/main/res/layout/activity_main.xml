@@ -258,7 +258,6 @@
             android:textColor="@color/main_bright"
             android:textSize="30sp" />
 
-
         <LinearLayout
             android:id="@+id/ll_rate_box"
             android:layout_width="match_parent"

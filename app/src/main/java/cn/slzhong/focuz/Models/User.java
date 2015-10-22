@@ -24,11 +24,13 @@ public class User {
 
     // real object body
     private Activity activity;
+    private String userId;
 
     public User(Activity a) {
         activity = a;
 
-        hasSignedIn = StorageUtil.getSharedPreference(activity, "userId") != null;
+        userId = StorageUtil.getSharedPreference(activity, "userId");
+        hasSignedIn = userId != null;
     }
 
     public static User getInstance(Activity activity) {
@@ -67,6 +69,10 @@ public class User {
         }
 
         return jsonObject;
+    }
+
+    public String getId() {
+        return userId;
     }
 
 }

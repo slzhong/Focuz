@@ -1,18 +1,25 @@
 package cn.slzhong.focuz.Models;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
+import cn.slzhong.focuz.Constants.URLS;
+import cn.slzhong.focuz.Utils.HttpUtil;
 import cn.slzhong.focuz.Utils.StorageUtil;
 
 /**
  * Created by SherlockZhong on 10/21/15.
  */
 public class Recorder {
+
+    public String userId;
 
     public long startAt;
     public long endAt;
@@ -24,10 +31,11 @@ public class Recorder {
     public long meditation;
     public int rate;
 
-    public Recorder() {
+    public Recorder(String id) {
         attentions = new ArrayList<>();
         meditations = new ArrayList<>();
         startAt = new Date().getTime();
+        userId = id;
     }
 
     public Recorder(JSONObject jsonObject) {
@@ -37,6 +45,7 @@ public class Recorder {
             rate = jsonObject.getInt("rate");
             attention = jsonObject.getLong("attention");
             meditation = jsonObject.getLong("meditation");
+            userId = jsonObject.has("userId") ? jsonObject.getString("userId") : "";
 
             JSONArray jsonAttentions = jsonObject.getJSONArray("attentions");
             attentions = new ArrayList<>();
@@ -85,6 +94,7 @@ public class Recorder {
 
         try {
             JSONObject jsonObject = new JSONObject();
+            jsonObject.put("userId", userId);
             jsonObject.put("startAt", startAt);
             jsonObject.put("endAt", endAt);
             jsonObject.put("rate", rate);
@@ -103,10 +113,31 @@ public class Recorder {
             }
             jsonObject.put("meditations", meditationsArray);
 
-            StorageUtil.saveStringAsFile(jsonObject.toString());
+            String tag = "" + (new Date().getTime());
+            StorageUtil.saveStringAsFile(tag, jsonObject.toString());
+            saveToServer(tag);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void saveToServer(final String tag) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<NameValuePair> params = new LinkedList<>();
+                params.add(new BasicNameValuePair("tag", tag));
+                params.add(new BasicNameValuePair("userId", userId));
+                params.add(new BasicNameValuePair("startAt", "" + startAt));
+                params.add(new BasicNameValuePair("endAt", "" + startAt));
+                params.add(new BasicNameValuePair("rate", "" + startAt));
+                params.add(new BasicNameValuePair("attention", "" + startAt));
+                params.add(new BasicNameValuePair("meditation", "" + startAt));
+                params.add(new BasicNameValuePair("attentions", attentions.toString()));
+                params.add(new BasicNameValuePair("meditations", meditations.toString()));
+                HttpUtil.post(URLS.SAVE, params);
+            }
+        }).start();
     }
 
 }

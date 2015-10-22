@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-import java.util.Date;
 
 import cn.slzhong.focuz.Constants.STRINGS;
 
@@ -30,12 +29,12 @@ public class StorageUtil {
         return sharedPreferences.getString(key, null);
     }
 
-    public static void saveStringAsFile(String content) {
+    public static void saveStringAsFile(String name, String content) {
         String path = Environment.getExternalStorageDirectory() + "/FOCUZ/";
         File dir = new File(path);
         dir.mkdir();
         try {
-            File file = new File(path + (new Date().getTime()));
+            File file = new File(path + name);
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             fileOutputStream.write(content.getBytes());
             fileOutputStream.close();
