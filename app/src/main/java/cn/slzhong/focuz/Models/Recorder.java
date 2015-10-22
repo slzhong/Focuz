@@ -90,8 +90,19 @@ public class Recorder {
             jsonObject.put("rate", rate);
             jsonObject.put("attention", attention);
             jsonObject.put("meditation", meditation);
-            jsonObject.put("attentions", attentions);
-            jsonObject.put("meditations", meditations);
+
+            JSONArray attentionsArray = new JSONArray();
+            for (int i = 0; i < attentions.size(); i++) {
+                attentionsArray.put(attentions.get(i));
+            }
+            jsonObject.put("attentions", attentionsArray);
+
+            JSONArray meditationsArray = new JSONArray();
+            for (int i = 0; i < meditations.size(); i++) {
+                meditationsArray.put(meditations.get(i));
+            }
+            jsonObject.put("meditations", meditationsArray);
+
             StorageUtil.saveStringAsFile(jsonObject.toString());
         } catch (Exception e) {
             e.printStackTrace();

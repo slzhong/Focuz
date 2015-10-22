@@ -3,6 +3,7 @@ package cn.slzhong.focuz.Activities;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -31,12 +32,20 @@ import android.widget.TextView;
 
 import com.neurosky.thinkgear.TGDevice;
 
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.chart.PointStyle;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.model.XYSeries;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
+import org.achartengine.renderer.XYSeriesRenderer;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import cn.slzhong.focuz.Constants.CODES;
 import cn.slzhong.focuz.Constants.URLS;
@@ -78,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
     private Button rate5;
     private Button rateSave;
     private LinearLayout result;
+    private LinearLayout resultChart;
     private TextView resultStart;
     private TextView resultEnd;
     private TextView resultTime;
@@ -180,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
         rateSave.setOnClickListener(new SaveListener());
 
         result = (LinearLayout) findViewById(R.id.ll_result);
+        resultChart = (LinearLayout) findViewById(R.id.ll_chart);
         resultStart = (TextView) findViewById(R.id.tv_start);
         resultEnd = (TextView) findViewById(R.id.tv_end);
         resultTime = (TextView) findViewById(R.id.tv_time);
@@ -280,32 +291,34 @@ public class MainActivity extends AppCompatActivity {
         historyList.removeAllViews();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         File[] files = StorageUtil.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            final File file = files[i];
-            TextView textView = new TextView(this);
-            textView.setText(sdf.format(new Date(Long.parseLong(file.getName()))));
-            textView.setTextColor(getResources().getColor(R.color.main_bright));
-            textView.setTextSize(20);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            layoutParams.setMargins(0, 40, 0, 40);
-            textView.setLayoutParams(layoutParams);
-            historyList.addView(textView);
-            textView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    isHistory = true;
-                    String data = StorageUtil.readStringFromFile(file.toString());
-                    try {
-                        JSONTokener jsonTokener = new JSONTokener(data);
-                        JSONObject jsonObject = (JSONObject) jsonTokener.nextValue();
-                        showResult(new Recorder(jsonObject));
-                        hideScene(history);
-                        showScene(result);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+        if (files != null && files.length > 0) {
+            for (int i = files.length - 1; i >= 0; i--) {
+                final File file = files[i];
+                TextView textView = new TextView(this);
+                textView.setText(sdf.format(new Date(Long.parseLong(file.getName()))));
+                textView.setTextColor(getResources().getColor(R.color.main_bright));
+                textView.setTextSize(20);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParams.setMargins(0, 40, 0, 40);
+                textView.setLayoutParams(layoutParams);
+                historyList.addView(textView);
+                textView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        isHistory = true;
+                        String data = StorageUtil.readStringFromFile(file.toString());
+                        try {
+                            JSONTokener jsonTokener = new JSONTokener(data);
+                            JSONObject jsonObject = (JSONObject) jsonTokener.nextValue();
+                            showResult(new Recorder(jsonObject));
+                            hideScene(history);
+                            showScene(result);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
 
@@ -548,6 +561,45 @@ public class MainActivity extends AppCompatActivity {
         resultAttention.setText("" + recorder.attention);
         resultMeditation.setText("" + recorder.meditation);
         resultRate.setText("" + recorder.rate);
+
+        showChart(recorder.attentions);
+    }
+
+    private void showChart(List<Integer> data) {
+        resultChart.removeAllViews();
+
+        XYMultipleSeriesRenderer multipleSeriesRenderer = new XYMultipleSeriesRenderer();
+        XYSeriesRenderer seriesRenderer = new XYSeriesRenderer();
+        seriesRenderer.setColor(getResources().getColor(R.color.theme));
+        seriesRenderer.setPointStyle(PointStyle.CIRCLE);
+        seriesRenderer.setFillPoints(true);
+        seriesRenderer.setLineWidth(5);
+        multipleSeriesRenderer.addSeriesRenderer(seriesRenderer);
+        multipleSeriesRenderer.setXAxisMin(0);
+        multipleSeriesRenderer.setXAxisMax(data.size() - 1);
+        multipleSeriesRenderer.setYAxisMin(0);
+        multipleSeriesRenderer.setYAxisMax(100);
+        multipleSeriesRenderer.setAxesColor(getResources().getColor(R.color.main_bright));
+        multipleSeriesRenderer.setLabelsColor(getResources().getColor(R.color.main_bright));
+        multipleSeriesRenderer.setShowGrid(true);
+        multipleSeriesRenderer.setGridColor(getResources().getColor(R.color.main_bright));
+        multipleSeriesRenderer.setXLabels(data.size());
+        multipleSeriesRenderer.setYLabels(10);
+        multipleSeriesRenderer.setLabelsTextSize(22);
+        multipleSeriesRenderer.setYLabelsAlign(Paint.Align.RIGHT);
+        multipleSeriesRenderer.setPointSize((float) 10);
+        multipleSeriesRenderer.setShowLegend(false);
+
+        XYSeries series = new XYSeries("ATTENTION LEVEL");
+        for (int i = 0; i < data.size(); i++) {
+            series.add(i, data.get(i));
+        }
+
+        XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
+        dataset.addSeries(series);
+
+        GraphicalView graphicalView = ChartFactory.getLineChartView(this, dataset, multipleSeriesRenderer);
+        resultChart.addView(graphicalView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
     }
 
     /**

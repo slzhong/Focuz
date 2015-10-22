@@ -328,7 +328,7 @@
                     android:layout_margin="10dp"
                     android:text="STARTED AT: "
                     android:textColor="@color/main_bright"
-                    android:textSize="15dp" />
+                    android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/tv_start"
@@ -338,8 +338,8 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:text=" "
-                    android:textColor="@color/main_bright"
-                    android:textSize="20dp" />
+                    android:textColor="@color/theme"
+                    android:textSize="20sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -347,7 +347,7 @@
                     android:layout_margin="10dp"
                     android:text="ENDED AT: "
                     android:textColor="@color/main_bright"
-                    android:textSize="15dp" />
+                    android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/tv_end"
@@ -357,8 +357,8 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:text=" "
-                    android:textColor="@color/main_bright"
-                    android:textSize="20dp" />
+                    android:textColor="@color/theme"
+                    android:textSize="20sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -366,7 +366,7 @@
                     android:layout_margin="10dp"
                     android:text="TOTAL TIME: "
                     android:textColor="@color/main_bright"
-                    android:textSize="15dp" />
+                    android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/tv_time"
@@ -376,8 +376,8 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:text=" "
-                    android:textColor="@color/main_bright"
-                    android:textSize="20dp" />
+                    android:textColor="@color/theme"
+                    android:textSize="20sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -385,7 +385,7 @@
                     android:layout_margin="10dp"
                     android:text="AVERAGE ATTENTION LEVEL(%): "
                     android:textColor="@color/main_bright"
-                    android:textSize="15dp" />
+                    android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/tv_attention"
@@ -395,8 +395,8 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:text=" "
-                    android:textColor="@color/main_bright"
-                    android:textSize="20dp" />
+                    android:textColor="@color/theme"
+                    android:textSize="20sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -404,7 +404,7 @@
                     android:layout_margin="10dp"
                     android:text="AVERAGE RELAXING LEVEL(%): "
                     android:textColor="@color/main_bright"
-                    android:textSize="15dp" />
+                    android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/tv_meditation"
@@ -414,8 +414,8 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:text=" "
-                    android:textColor="@color/main_bright"
-                    android:textSize="20dp" />
+                    android:textColor="@color/theme"
+                    android:textSize="20sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -423,7 +423,7 @@
                     android:layout_margin="10dp"
                     android:text="YOUR PERSONAL RATE(0~5): "
                     android:textColor="@color/main_bright"
-                    android:textSize="15dp" />
+                    android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/tv_rate"
@@ -433,13 +433,31 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:text=" "
+                    android:textColor="@color/theme"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="LINE CHART OF ATTENTION LEVEL: "
                     android:textColor="@color/main_bright"
-                    android:textSize="20dp" />
+                    android:textSize="15sp" />
+
+                <LinearLayout
+                    android:id="@+id/ll_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="horizontal"></LinearLayout>
 
                 <Button
                     android:id="@+id/bt_back"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:layout_marginTop="30dp"
