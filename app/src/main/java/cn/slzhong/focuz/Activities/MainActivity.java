@@ -44,6 +44,7 @@ import org.json.JSONTokener;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -78,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
     private Button mainStopwatch;
     private Button mainHistory;
     private Button mainStop;
+    private LinearLayout mainLive;
+    private TextView mainLiveTitle;
     private TextView mainStatus;
     private RelativeLayout rate;
     private Button rate1;
@@ -117,6 +120,10 @@ public class MainActivity extends AppCompatActivity {
     private int tgTime = -1;
     private int tgCount = 0;
     private boolean isHistory = false;
+
+    private XYSeries liveSeries;
+    private XYMultipleSeriesDataset liveDataset;
+    private GraphicalView liveView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,6 +177,8 @@ public class MainActivity extends AppCompatActivity {
         mainHistory = (Button) findViewById(R.id.bt_history);
         mainStop = (Button) findViewById(R.id.bt_stop);
         mainStatus = (TextView) findViewById(R.id.tv_status);
+        mainLive = (LinearLayout) findViewById(R.id.ll_live);
+        mainLiveTitle = (TextView) findViewById(R.id.tv_live_title);
         mainTimer.setOnClickListener(new TimerListener());
         mainStopwatch.setOnClickListener(new StopwatchListener());
         mainStop.setOnClickListener(new StopListener());
@@ -263,6 +272,7 @@ public class MainActivity extends AppCompatActivity {
                     case TGDevice.MSG_ATTENTION:
                         System.out.println("***** a" + msg.arg1);
                         tgAttention = msg.arg1;
+                        updateLive(msg.arg1);
                         break;
                     case TGDevice.MSG_RAW_DATA:
                         break;
@@ -545,6 +555,37 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void startLive() {
+        liveSeries = new XYSeries("LIVE");
+        liveDataset = new XYMultipleSeriesDataset();
+        liveDataset.addSeries(liveSeries);
+        liveView = ChartFactory.getLineChartView(this, liveDataset, generateRenderer(19, 100, 20, 10));
+        mainLive.addView(liveView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
+    }
+
+    private void updateLive(int value) {
+        if (liveSeries != null && liveView != null) {
+            List<Double> tmp = new ArrayList<>();
+            for (int i = 0; i < liveSeries.getItemCount(); i++) {
+                tmp.add(liveSeries.getY(i));
+            }
+
+            liveSeries.clear();
+            liveDataset.removeSeries(liveSeries);
+
+            liveSeries.add(0, value);
+            for (int i = 1; i < 20; i++) {
+                if (i - 1 < tmp.size()) {
+                    liveSeries.add(i, tmp.get(i - 1));
+                } else {
+                    break;
+                }
+            }
+            liveDataset.addSeries(liveSeries);
+            liveView.invalidate();
+        }
+    }
+
     private void showResult(Recorder recorder) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         resultStart.setText("" + sdf.format(new Date(recorder.startAt)));
@@ -568,28 +609,6 @@ public class MainActivity extends AppCompatActivity {
     private void showChart(List<Integer> data) {
         resultChart.removeAllViews();
 
-        XYMultipleSeriesRenderer multipleSeriesRenderer = new XYMultipleSeriesRenderer();
-        XYSeriesRenderer seriesRenderer = new XYSeriesRenderer();
-        seriesRenderer.setColor(getResources().getColor(R.color.theme));
-        seriesRenderer.setPointStyle(PointStyle.CIRCLE);
-        seriesRenderer.setFillPoints(true);
-        seriesRenderer.setLineWidth(5);
-        multipleSeriesRenderer.addSeriesRenderer(seriesRenderer);
-        multipleSeriesRenderer.setXAxisMin(0);
-        multipleSeriesRenderer.setXAxisMax(data.size() - 1);
-        multipleSeriesRenderer.setYAxisMin(0);
-        multipleSeriesRenderer.setYAxisMax(100);
-        multipleSeriesRenderer.setAxesColor(getResources().getColor(R.color.main_bright));
-        multipleSeriesRenderer.setLabelsColor(getResources().getColor(R.color.main_bright));
-        multipleSeriesRenderer.setShowGrid(true);
-        multipleSeriesRenderer.setGridColor(getResources().getColor(R.color.main_bright));
-        multipleSeriesRenderer.setXLabels(data.size());
-        multipleSeriesRenderer.setYLabels(10);
-        multipleSeriesRenderer.setLabelsTextSize(22);
-        multipleSeriesRenderer.setYLabelsAlign(Paint.Align.RIGHT);
-        multipleSeriesRenderer.setPointSize((float) 10);
-        multipleSeriesRenderer.setShowLegend(false);
-
         XYSeries series = new XYSeries("ATTENTION LEVEL");
         for (int i = 0; i < data.size(); i++) {
             series.add(i, data.get(i));
@@ -598,8 +617,33 @@ public class MainActivity extends AppCompatActivity {
         XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
         dataset.addSeries(series);
 
-        GraphicalView graphicalView = ChartFactory.getLineChartView(this, dataset, multipleSeriesRenderer);
+        GraphicalView graphicalView = ChartFactory.getLineChartView(this, dataset, generateRenderer(data.size() - 1, 100, data.size(), 10));
         resultChart.addView(graphicalView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
+    }
+
+    private XYMultipleSeriesRenderer generateRenderer(int xMax, int yMax, int xLabel, int yLabel) {
+        XYMultipleSeriesRenderer multipleSeriesRenderer = new XYMultipleSeriesRenderer();
+        XYSeriesRenderer seriesRenderer = new XYSeriesRenderer();
+        seriesRenderer.setColor(getResources().getColor(R.color.theme));
+        seriesRenderer.setPointStyle(PointStyle.CIRCLE);
+        seriesRenderer.setFillPoints(true);
+        seriesRenderer.setLineWidth(5);
+        multipleSeriesRenderer.addSeriesRenderer(seriesRenderer);
+        multipleSeriesRenderer.setXAxisMin(0);
+        multipleSeriesRenderer.setXAxisMax(xMax);
+        multipleSeriesRenderer.setYAxisMin(0);
+        multipleSeriesRenderer.setYAxisMax(yMax);
+        multipleSeriesRenderer.setAxesColor(getResources().getColor(R.color.main_bright));
+        multipleSeriesRenderer.setLabelsColor(getResources().getColor(R.color.main_bright));
+        multipleSeriesRenderer.setShowGrid(true);
+        multipleSeriesRenderer.setGridColor(getResources().getColor(R.color.main_bright));
+        multipleSeriesRenderer.setXLabels(xLabel);
+        multipleSeriesRenderer.setYLabels(yLabel);
+        multipleSeriesRenderer.setLabelsTextSize(22);
+        multipleSeriesRenderer.setYLabelsAlign(Paint.Align.RIGHT);
+        multipleSeriesRenderer.setPointSize((float) 10);
+        multipleSeriesRenderer.setShowLegend(false);
+        return multipleSeriesRenderer;
     }
 
     /**
@@ -675,8 +719,11 @@ public class MainActivity extends AppCompatActivity {
                 mainTimer.setVisibility(View.GONE);
                 mainStopwatch.setVisibility(View.GONE);
                 mainHistory.setVisibility(View.GONE);
+                mainLiveTitle.setVisibility(View.VISIBLE);
+                mainLive.setVisibility(View.VISIBLE);
                 mainStop.setVisibility(View.VISIBLE);
                 startLoop();
+                startLive();
             } else {
                 showAlert("CONNECT TO A THINK GEAR DEVICE BEFORE STARTING A TASK");
             }
@@ -712,6 +759,9 @@ public class MainActivity extends AppCompatActivity {
             mainStopwatch.setVisibility(View.VISIBLE);
             mainHistory.setVisibility(View.VISIBLE);
             mainStop.setVisibility(View.GONE);
+            mainLiveTitle.setVisibility(View.GONE);
+            mainLive.setVisibility(View.GONE);
+            mainLive.removeAllViews();
             hideScene(main);
             showScene(rate);
         }
